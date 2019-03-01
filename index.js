@@ -2,8 +2,17 @@ const nock = require('nock'),
   Url = require('url'),
   Busboy = require('busboy'),
   str = require('string-to-stream'),
+  btoa = require('btoa'),
+  crypto = require('crypto-js'),
+  Hawk = require('hawk')
 
   ECHO_HOST = 'https://postman-echo.com',
+
+  AUTH = 'auth',
+  COLON = ':',
+  AUTH_INT = 'auth-int',
+  MD5_SESS = 'MD5-sess',
+
 
   getQueryParams = function (queryString) {
     if (!queryString) return {};
@@ -15,6 +24,16 @@ const nock = require('nock'),
 
       return args;
     }, {})
+  },
+
+  authInfoParser = function (authData) {
+    var authenticationObj = {};
+    authData.split(', ').forEach(function (d) {
+        d = d.split('=');
+  
+        authenticationObj[d[0]] = d[1].replace(/"/g, '');
+    });
+    return authenticationObj;
   },
 
   multipartFormParser = function (req, reqBody, callback) {
@@ -183,6 +202,129 @@ Echo
     setTimeout(() => {
       callback(null, {delay})
     }, parseInt(delay * 1000));
+  });
+
+
+/***** Authentication Methods *****/
+
+// Basic Auth
+Echo
+  .get('/basic-auth')
+  .query(true)
+  .reply(function (uri, body) {
+    var user = {
+      username: 'postman',
+      password: 'password'
+    };
+
+    if (this.req.headers.authorization && 
+        this.req.headers.authorization.replace(/^Basic /, '') === btoa(user.username+':'+user.password)) {
+          return [
+            200,
+            { authenticated: true }
+          ];
+    }
+
+    return [
+      401,
+      'Unauthorized'
+    ];
+  });
+
+// DigestAuth Success
+Echo
+  .get('/digest-auth')
+  .query(true)
+  .reply(function (uri, body) {
+    var authInfo,
+      A0,
+      A1,
+      A2,
+      reqDigest,
+      user = {
+        username: 'postman',
+        password: 'password',
+        realm: 'Users'
+      },
+      unauthorizedResponse = [
+        401,
+        'Unauthorized',
+        {
+          'WWW-Authenticate': `Digest realm="Users",qop="auth",nonce="${Math.random()}"`
+        }
+      ];
+
+    if(!this.req.headers.authorization) { return unauthorizedResponse; }
+
+    authInfo = this.req.headers.authorization.replace(/^Digest /, '');
+    authInfo = authInfoParser(authInfo);
+
+    if (authInfo.username !== user.username) {
+      return unauthorizedResponse;
+    }
+
+    if (authInfo.algorithm === MD5_SESS) {
+      A0 = crypto.MD5(authInfo.username + COLON + user.realm + COLON + user.password).toString();
+      A1 = A0 + COLON + authInfo.nonce + COLON + authInfo.cnonce;
+    }
+    else {
+        A1 = authInfo.username + COLON + user.realm + COLON + user.password;
+    }
+
+    if (authInfo.qop === AUTH_INT) {
+        A2 = 'GET' + COLON + authInfo.uri + COLON + crypto.MD5(body);
+    }
+    else {
+        A2 = 'GET' + COLON + authInfo.uri;
+    }
+
+    A1 = crypto.MD5(A1).toString();
+    A2 = crypto.MD5(A2).toString();
+
+    if (authInfo.qop === AUTH || authInfo.qop === AUTH_INT) {
+        reqDigest = crypto.MD5([A1, authInfo.nonce, authInfo.nc, authInfo.cnonce, authInfo.qop, A2].join(COLON)).toString();
+    }
+    else {
+        reqDigest = crypto.MD5([A1, authInfo.nonce, A2].join(COLON)).toString();
+    }
+
+    if (reqDigest === authInfo.response) {
+      return [
+        200,
+        { authenticated: true }
+      ]
+    } 
+  
+    return unauthorizedResponse;
+  });
+
+// Hawk Auth
+Echo
+  .get('/auth/hawk')
+  .query(true)
+  .reply(function (uri, body, callback) {
+    var response;
+
+    Hawk.server.authenticate(this.req, function () {
+      return {
+        key: 'uabsddiasndiuasbdiuasdbasiudbasiu',
+        algorithm: 'sha256',
+        user : 'Postman'
+      };
+    }).then(function () {
+      console.log('------------------------------');
+    })
+    .catch(function (err) {
+      console.log('********************************');
+      console.log(err);
+      callback(null, [
+        401,
+        'rETRY',
+        {
+          'Server-Authorization': Hawk.server.header(err.credentials, err.artifacts)
+        }
+      ]);
+    });
   });
 
 module.exports = Echo;
