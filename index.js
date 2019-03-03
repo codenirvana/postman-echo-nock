@@ -1,10 +1,15 @@
-const nock = require('nock'),
+const _ = require('lodash'),
+  nock = require('nock'),
   Url = require('url'),
   Busboy = require('busboy'),
   str = require('string-to-stream'),
   btoa = require('btoa'),
   crypto = require('crypto-js'),
-  Hawk = require('hawk')
+  zlib = require('zlib'),
+  qs = require('qs'),
+  cookie = require('cookie'),
+  Hawk = require('hawk'),
+  EncodingService = require('./EncodingService'),
 
   ECHO_HOST = 'https://postman-echo.com',
 
@@ -112,6 +117,7 @@ const nock = require('nock'),
     'set-cookie': 'sails.sid=0123456789; Path=/; HttpOnly'
   });
 
+  
 /***** Request Methods *****/
 
 // GET Request
@@ -176,32 +182,6 @@ Echo
       headers = getQueryParams(url.query);
 
     return [200, headers, headers];
-  });
-
-
-/***** Utilities *****/
-
-// Response Status Code
-Echo
-  .get(/^\/status\/[1-5][0-9][0-9]$/)
-  .query(true)
-  .reply(function (uri) {
-    const status = parseInt(uri.substr(-3));
-
-    return [status, {
-      status
-    }]
-  });
-
-// Delay Response
-Echo
-  .get(/^\/delay\/\d+$/)
-  .query(true)
-  .reply(200, function (uri, body, callback) {
-    const delay = uri.split('/')[2];
-    setTimeout(() => {
-      callback(null, {delay})
-    }, parseInt(delay * 1000));
   });
 
 
@@ -325,6 +305,141 @@ Echo
         }
       ]);
     });
+  });
+
+
+/***** Cookie Manipulation *****/
+
+// Set Cookies
+Echo
+  .get('/cookies/set')
+  .query(true)
+  .reply(function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString);
+
+      return [
+        302,
+        'Found. Redirecting to /cookies',
+        {
+          'Location': '/cookies',
+          'set-cookie': _.transform(queries, function (result, value, key) {
+              result.push(`${key}=${value}; Path=/`);
+            }, [])
+        }
+      ]
+  });
+
+// Get Cookies
+// @Todo: Why add "sails.sid": "0123456789" cookie in default headers?
+Echo
+  .get('/cookies')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var cookieString = this.req.headers.cookie || '',
+      cookies = cookie.parse(cookieString);
+
+      return {
+        cookies: cookies
+      };
+  });
+
+// Delete Cookies
+Echo
+  .get('/cookies/delete')
+  .query(true)
+  .reply(function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString);
+
+      return [
+        302,
+        'Found. Redirecting to /cookies',
+        {
+          'Location': '/cookies',
+          'set-cookie': _.transform(queries, function (result, value, key) {
+              result.push(`${key}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+            }, [])
+        }
+      ]
+  });
+
+
+/***** Utilities *****/
+
+// Response Status Code
+Echo
+  .get(/^\/status\/[1-5][0-9][0-9]$/)
+  .query(true)
+  .reply(function (uri) {
+    const status = parseInt(uri.substr(-3));
+
+    return [status, {
+      status
+    }]
+  });
+
+// Delay Response
+Echo
+  .get(/^\/delay\/\d+$/)
+  .query(true)
+  .reply(200, function (uri, body, callback) {
+    const delay = uri.split('/')[2];
+    setTimeout(() => {
+      callback(null, {delay})
+    }, parseInt(delay * 1000));
+  });
+
+// Get UTF8 Encoded Response
+Echo
+  .get('/encoding/utf8')
+  .query(true)
+  .reply(200, EncodingService.utf8Text, {
+    'content-type': 'text/html; charset=utf-8'
+  });
+
+// GZip Compressed Response
+Echo
+  .get('/gzip')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var data = {
+        gzipped: true,
+        headers: this.req.headers,
+        method: 'GET'
+      },
+      buffer = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+      return zlib.gzipSync(buffer);
+  }, {
+    'Content-Encoding': 'gzip',
+    'Content-Type': 'application/json'
+  });
+
+// Deflate Compressed Response
+Echo
+  .get('/deflate')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var data = {
+        deflated: true,
+        headers: this.req.headers,
+        method: 'GET'
+      },
+      buffer = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+      return zlib.deflateSync(buffer);
+  }, {
+    'Content-Encoding': 'deflate',
+    'Content-Type': 'application/json'
+  });
+
+// IP address in JSON format
+Echo
+  .get('/ip')
+  .query(true)
+  .reply(200, {
+    "ip": "127.0.0.1"     // need to figure out IP of host? That will be localhost anyway Can't use the way used in postman-echo because of nock.
   });
 
 module.exports = Echo;
