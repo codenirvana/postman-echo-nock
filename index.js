@@ -9,6 +9,7 @@ const _ = require('lodash'),
   qs = require('qs'),
   cookie = require('cookie'),
   Hawk = require('hawk'),
+  moment = require('moment'),
   EncodingService = require('./EncodingService'),
 
   ECHO_HOST = 'https://postman-echo.com',
@@ -439,7 +440,192 @@ Echo
   .get('/ip')
   .query(true)
   .reply(200, {
-    "ip": "127.0.0.1"     // need to figure out IP of host? That will be localhost anyway Can't use the way used in postman-echo because of nock.
+    "ip": "127.0.0.1"     // localhost IP for nocked requests
+  });
+
+
+/***** Utilities / Date and Time *****/
+
+// Current UTC time
+Echo
+  .get('/time/now')
+  .query(true)
+  .reply(200, (new Date()).toUTCString());
+
+// Timestamp validity
+Echo
+  .get('/time/valid')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        valid: createdMoment.isValid()
+      };
+  });
+
+// Format timestamp
+Echo
+  .get('/time/format')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        format: createdMoment.format(queries.format)
+      };
+  });
+
+// Extract timestamp unit
+Echo
+  .get('/time/unit')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        unit: createdMoment.get(queries.unit || 'year')
+      };
+  });
+
+// Time addition
+Echo
+  .get('/time/add')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      addParams = _.pick(queries, ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        sum: createdMoment.add(addParams).toString()
+      };
+  });
+
+// Time subtraction
+Echo
+  .get('/time/subtract')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      addParams = _.pick(queries, ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        sum: createdMoment.subtract(addParams).toString()
+      };
+  });
+
+// Start of time
+Echo
+  .get('/time/start')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        start: createdMoment.startOf(queries.unit).toString()
+      };
+  });
+
+// Object representation
+Echo
+  .get('/time/object')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return createdMoment.toObject();
+  });
+
+// Before comparisons
+Echo
+  .get('/time/before')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        before: createdMoment.isBefore(queries.target)
+      };
+  });
+
+// After comparisons
+Echo
+  .get('/time/after')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        after: createdMoment.isAfter(queries.target)
+      };
+  });
+
+// Between timestamps
+Echo
+  .get('/time/between')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        between: createdMoment.isBetween(queries.start, queries.end, queries.unit)
+      };
+  });
+
+// Leap year check
+Echo
+  .get('/time/leap')
+  .query(true)
+  .reply(200, function (uri, body) {
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
+      queries = qs.parse(queryString),
+      momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
+      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+
+      return {
+        leap: createdMoment.isLeapYear()
+      };
   });
 
 module.exports = Echo;
