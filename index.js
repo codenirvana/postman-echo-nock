@@ -1,6 +1,7 @@
 const _ = require('lodash'),
   nock = require('nock'),
   Url = require('url'),
+  util = require('./util'),
   {Readable} = require('stream'),
   Busboy = require('busboy'),
   str = require('string-to-stream'),
@@ -652,6 +653,27 @@ Echo
       return {
         leap: createdMoment.isLeapYear()
       };
+  });
+
+/***** Newman sample echo *****/
+Echo
+  .get(/^\/type\/(html|xml)$/)
+  .query({
+    source: "newman-sample-github-collection"
+  })
+  .reply(function(uri){
+    var queryIndex = this.req.path.indexOf('?'),
+      queryString = this.req.path.slice(queryIndex + 1),
+      queries = qs.parse(queryString),
+      type = uri.slice(0, queryIndex).split('/')[2];
+
+    return [
+      200,
+      util.cachedFiles[queries.source][type],
+      {
+        'content-type':`application/${type}; charset=utf-8`
+      }
+    ];
   });
 
 module.exports = Echo;
