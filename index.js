@@ -36,7 +36,7 @@ const _ = require('lodash'),
     var authenticationObj = {};
     authData.split(', ').forEach(function (d) {
         d = d.split('=');
-  
+
         authenticationObj[d[0]] = d[1].replace(/"/g, '');
     });
     return authenticationObj;
@@ -115,10 +115,10 @@ const _ = require('lodash'),
     ETag: '0123456789',
     Server: 'Nock',
     Vary: 'Accept-Encoding',
-    'set-cookie': 'sails.sid=0123456789; Path=/; HttpOnly'
+    'set-cookie': 'sails.sid=0123456789; Path=/'
   });
 
-  
+
 /***** Request Methods *****/
 
 // GET Request
@@ -198,7 +198,7 @@ Echo
       password: 'password'
     };
 
-    if (this.req.headers.authorization && 
+    if (this.req.headers.authorization &&
         this.req.headers.authorization.replace(/^Basic /, '') === btoa(user.username+':'+user.password)) {
           return [
             200,
@@ -274,8 +274,8 @@ Echo
         200,
         { authenticated: true }
       ]
-    } 
-  
+    }
+
     return unauthorizedResponse;
   });
 
