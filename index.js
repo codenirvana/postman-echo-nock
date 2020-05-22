@@ -1,6 +1,7 @@
 const _ = require('lodash'),
   nock = require('nock'),
   Url = require('url'),
+  {Readable} = require('stream'),
   Busboy = require('busboy'),
   str = require('string-to-stream'),
   btoa = require('btoa'),
@@ -319,6 +320,7 @@ Echo
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString);
+      queries['sails.sid'] = '0123456789';//else, the default set cookies are replaced
 
       return [
         302,
@@ -380,6 +382,30 @@ Echo
     return [status, {
       status
     }]
+  });
+
+// Streamed Response
+Echo
+  .get(/^\/stream\/\d+$/)
+  .query(true)
+  .reply(200, function (uri) {
+    var frequency = uri.split('/')[2],
+      url = Url.parse(this.basePath + uri),
+      singleResponse = JSON.stringify({
+        args: {
+          n: frequency
+        },
+        headers: this.req.headers,
+        url: url.href
+      }, null, 2),
+
+      body = new Readable({
+        read(){
+          frequency-- ? this.push(singleResponse):this.push(null);
+        }
+      });
+
+      return body;
   });
 
 // Delay Response
