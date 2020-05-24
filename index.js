@@ -78,7 +78,7 @@ const _ = require('lodash'),
   },
 
   bodyParser = function (uri, reqBody, callback) {
-    const url = Url.parse(decodeURIComponent(this.basePath + uri));
+    const url = Url.parse(decodeURIComponent(ECHO_HOST + uri));
     req = {
         args: getQueryParams(url.query),
         data: {},
@@ -108,7 +108,9 @@ const _ = require('lodash'),
     callback(null, req);
   },
 
-  Echo = nock(ECHO_HOST)
+  Echo = nock(ECHO_HOST,
+    {allowUnmocked: true} // allow requests to unmocked routes to actually make a HTTP request
+  )
   .persist()
   .replyContentLength()
   .replyDate()
@@ -117,7 +119,7 @@ const _ = require('lodash'),
     ETag: '0123456789',
     Server: 'Nock',
     Vary: 'Accept-Encoding',
-    'set-cookie': 'sails.sid=0123456789; Path=/'
+    'set-cookie': 'sails.sid=0123456789; Path=/; HttpOnly'
   });
 
 
@@ -128,7 +130,7 @@ Echo
   .get('/get')
   .query(true)
   .reply(200, function (uri) {
-    const url = Url.parse(this.basePath + uri);
+    const url = Url.parse(ECHO_HOST + uri);
 
     return JSON.stringify({
       args: getQueryParams(url.query),
@@ -181,7 +183,7 @@ Echo
   .get('/response-headers')
   .query(true)
   .reply(function (uri) {
-    const url = Url.parse(this.basePath + uri),
+    const url = Url.parse(ECHO_HOST + uri),
       headers = getQueryParams(url.query);
 
     return [200, headers, headers];
@@ -286,20 +288,25 @@ Echo
   .get('/auth/hawk')
   .query(true)
   .reply(function (uri, body, callback) {
-    var response;
+    // the request object of the nock is an altered one, hence the following fixes
+    this.req.url = uri;
+    this.req.headers.host === 'postman-echo.com' && (this.req.connection.encrypted = true); // false while testing using localhost
 
     Hawk.server.authenticate(this.req, function () {
       return {
-        key: 'uabsddiasndiuasbdiuasdbasiudbasiu',
+        key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
         algorithm: 'sha256',
         user : 'Postman'
       };
     }).then(function () {
-      console.log('------------------------------');
+      callback(null,[
+        200,
+        {
+          message: 'Hawk Authentication Successful'
+        }
+      ])
     })
     .catch(function (err) {
-      console.log('********************************');
-      console.log(err);
       callback(null, [
         401,
         'rETRY',
@@ -391,7 +398,7 @@ Echo
   .query(true)
   .reply(200, function (uri) {
     var frequency = uri.split('/')[2],
-      url = Url.parse(this.basePath + uri),
+      url = Url.parse(ECHO_HOST + uri),
       singleResponse = JSON.stringify({
         args: {
           n: frequency
