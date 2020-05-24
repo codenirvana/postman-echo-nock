@@ -22,18 +22,6 @@ const _ = require('lodash'),
   MD5_SESS = 'MD5-sess',
 
 
-  getQueryParams = function (queryString) {
-    if (!queryString) return {};
-
-    return queryString.split('&').reduce((args, query) => {
-      const arg = query.split(/=(.+)/); // first match
-
-      args[arg[0]] = arg[1];
-
-      return args;
-    }, {})
-  },
-
   authInfoParser = function (authData) {
     var authenticationObj = {};
     authData.split(', ').forEach(function (d) {
@@ -78,15 +66,15 @@ const _ = require('lodash'),
   },
 
   bodyParser = function (uri, reqBody, callback) {
-    const url = Url.parse(decodeURIComponent(ECHO_HOST + uri));
+    const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true);
     req = {
-        args: getQueryParams(url.query),
+        args: url.query,
         data: {},
         files: {},
         form: {},
         headers: this.req.headers,
         json: null,
-        url: url.href
+        url: ECHO_HOST + uri
       },
       contentType = req.headers && req.headers['content-type'];
 
@@ -130,12 +118,12 @@ Echo
   .get('/get')
   .query(true)
   .reply(200, function (uri) {
-    const url = Url.parse(ECHO_HOST + uri);
+    const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true);
 
     return JSON.stringify({
-      args: getQueryParams(url.query),
+      args: url.query,
       headers: this.req.headers,
-      url: url.href
+      url: ECHO_HOST + uri
     })
   }, {
     'content-type': 'application/json; charset=utf-8'
@@ -183,8 +171,8 @@ Echo
   .get('/response-headers')
   .query(true)
   .reply(function (uri) {
-    const url = Url.parse(ECHO_HOST + uri),
-      headers = getQueryParams(url.query);
+    const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true),
+      headers = url.query;
 
     return [200, headers, headers];
   });
@@ -398,13 +386,12 @@ Echo
   .query(true)
   .reply(200, function (uri) {
     var frequency = uri.split('/')[2],
-      url = Url.parse(ECHO_HOST + uri),
       singleResponse = JSON.stringify({
         args: {
           n: frequency
         },
         headers: this.req.headers,
-        url: url.href
+        url: ECHO_HOST + uri
       }, null, 2),
 
       body = new Readable({
