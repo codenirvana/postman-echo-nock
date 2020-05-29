@@ -20,14 +20,17 @@ const _ = require('lodash'),
   COLON = ':',
   AUTH_INT = 'auth-int',
   MD5_SESS = 'MD5-sess',
+  OAUTH_SIGNATURE = 'oauth_signature',
+
+  OAUTH_KEY = 'D+EdQ-gs$-%@2Nu7',
 
 
   authInfoParser = function (authData) {
     var authenticationObj = {};
-    authData.split(', ').forEach(function (d) {
+    authData.split(',').forEach(function (d) {
         d = d.split('=');
 
-        authenticationObj[d[0]] = d[1].replace(/"/g, '');
+        authenticationObj[d[0].replace(' ','')] = d[1].replace(/"/g, '');
     });
     return authenticationObj;
   },
@@ -173,7 +176,7 @@ Echo
   .reply(function (uri) {
     const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true),
       headers = url.query;
-
+    headers['Content-Type'] = 'application/json; charset=utf-8';
     return [200, headers, headers];
   });
 
@@ -303,6 +306,57 @@ Echo
         }
       ]);
     });
+  });
+
+// OAuth1.0 (verify signature)
+Echo
+  .get('/oauth1')
+  .query(true)
+  .reply(function (uri) {
+    const authInfo = authInfoParser(this.req.headers.authorization.replace(/^OAuth /, '')),
+      url = Url.parse((ECHO_HOST + uri), true),
+      baseUri = ECHO_HOST + url.pathname,
+      parameters = {
+        ...url.query,
+        ...authInfo
+      },
+
+      normalizedParamString = Object
+        .keys(_.omit(parameters, [OAUTH_SIGNATURE])) // omit OAUTH_SIGNATURE which is later used in verifying
+        .sort()
+        .reduce((res, key) => {
+          res.push(`${key}=${parameters[key]}`);
+          return res;
+        },[])
+        .join('&'),
+      baseString = `${this.req.method}&${encodeURIComponent(baseUri)}&${encodeURIComponent(normalizedParamString)}`,
+
+      signingKey=`${encodeURIComponent(OAUTH_KEY)}&`, // since there is no oauth_token, nothing follows '&'
+
+      oauthSignature = encodeURIComponent(crypto.enc.Base64.stringify(crypto.HmacSHA1(baseString, signingKey)));
+
+      if (oauthSignature === parameters[OAUTH_SIGNATURE]){
+        return [
+          200,
+          {
+            status: "pass",
+            message: "OAuth-1.0a signature verification was successful"
+          }
+        ]
+      }
+      else{
+        return [
+          401,
+          {
+            status: "fail",
+            message: "HMAC-SHA1 verification failed",
+            base_uri: baseUri,
+            normalized_param_string: normalizedParamString,
+            base_string: baseString,
+            signing_key: signingKey
+          }
+        ]
+      };
   });
 
 
