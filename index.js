@@ -176,8 +176,8 @@ Echo
   .reply(function (uri) {
     const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true),
       headers = url.query;
-    headers['Content-Type'] = 'application/json; charset=utf-8';
-    return [200, headers, headers];
+
+    return [200, JSON.stringify(headers,null,4), headers];
   });
 
 
@@ -455,6 +455,8 @@ Echo
       });
 
       return body;
+  }, {
+    'Transfer-Encoding': 'chunked',
   });
 
 // Delay Response
@@ -473,7 +475,8 @@ Echo
   .get('/encoding/utf8')
   .query(true)
   .reply(200, EncodingService.utf8Text, {
-    'content-type': 'text/html; charset=utf-8'
+    'content-type': 'text/html; charset=utf-8',
+    'transfer-encoding': 'chunked',
   });
 
 // GZip Compressed Response
@@ -490,7 +493,7 @@ Echo
       return zlib.gzipSync(buffer);
   }, {
     'Content-Encoding': 'gzip',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json; charset=utf-8'
   });
 
 // Deflate Compressed Response
@@ -585,8 +588,7 @@ Echo
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       addParams = _.pick(queries, ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']),
-      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
-
+      createdMoment = moment.utc(momentParams.timestamp, momentParams.format, momentParams.strict);
       return {
         sum: createdMoment.add(addParams).toString()
       };
@@ -602,10 +604,10 @@ Echo
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       addParams = _.pick(queries, ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']),
-      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+      createdMoment = moment.utc(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
       return {
-        sum: createdMoment.subtract(addParams).toString()
+        difference: createdMoment.subtract(addParams).toString()
       };
   });
 
@@ -618,7 +620,7 @@ Echo
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
-      createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
+      createdMoment = moment.utc(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
       return {
         start: createdMoment.startOf(queries.unit).toString()
