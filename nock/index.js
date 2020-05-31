@@ -2,7 +2,7 @@ const _ = require('lodash'),
   nock = require('nock'),
   Url = require('url'),
   util = require('./util'),
-  {Readable} = require('stream'),
+  { Readable } = require('stream'),
   btoa = require('btoa'),
   crypto = require('crypto-js'),
   zlib = require('zlib'),
@@ -24,7 +24,7 @@ const _ = require('lodash'),
   BASIC_AUTH_USERNAME = 'postman',
   BASIC_AUTH_PASSWORD = 'password',
   DIGEST_AUTH_USERNAME = 'postman',
-  DIGEST_AUTH_PASSWORD ='password',
+  DIGEST_AUTH_PASSWORD = 'password',
   DIGEST_AUTH_REALM = 'Users',
   HAWK_AUTH_KEY = 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
   HAWK_AUTH_ALGORITHM = 'sha256',
@@ -32,21 +32,22 @@ const _ = require('lodash'),
 
 
   Echo = nock(ECHO_HOST,
-    {allowUnmocked: true} // allow requests to unmocked routes to actually make a HTTP request
-  )
-  .persist()
-  .replyContentLength()
-  .replyDate()
-  .defaultReplyHeaders({
-    Connection: 'keep-alive',
-    ETag: '0123456789',
-    Server: 'Nock',
-    Vary: 'Accept-Encoding',
-    'set-cookie': 'sails.sid=0123456789; Path=/; HttpOnly'
-  });
+    {
+      allowUnmocked: true // allow requests to unmocked routes to actually make a HTTP request
+    })
+    .persist()
+    .replyContentLength()
+    .replyDate()
+    .defaultReplyHeaders({
+      Connection: 'keep-alive',
+      ETag: '0123456789',
+      Server: 'Nock',
+      Vary: 'Accept-Encoding',
+      'set-cookie': 'sails.sid=0123456789; Path=/; HttpOnly'
+    });
 
 
-/***** Request Methods *****/
+/** *** Request Methods *****/
 
 // GET Request
 Echo
@@ -59,7 +60,7 @@ Echo
       args: url.query,
       headers: this.req.headers,
       url: ECHO_HOST + uri
-    })
+    });
   }, {
     'content-type': 'application/json; charset=utf-8'
   });
@@ -76,6 +77,7 @@ Echo
   .query(true)
   .reply(200, util.bodyParser);
 
+
 // PATCH Request
 Echo
   .patch('/patch')
@@ -89,7 +91,7 @@ Echo
   .reply(200, util.bodyParser);
 
 
-/***** Headers *****/
+/** *** Headers *****/
 
 // Request Headers
 Echo
@@ -109,28 +111,28 @@ Echo
     const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true),
       headers = url.query;
 
-    return [200, JSON.stringify(headers,null,4), headers];
+    return [200, JSON.stringify(headers, null, 4), headers];
   });
 
 
-/***** Authentication Methods *****/
+/** *** Authentication Methods *****/
 
 // Basic Auth
 Echo
   .get('/basic-auth')
   .query(true)
-  .reply(function (uri, body) {
+  .reply(function () {
     var user = {
       username: BASIC_AUTH_USERNAME,
       password: BASIC_AUTH_PASSWORD
     };
 
     if (this.req.headers.authorization &&
-        this.req.headers.authorization.replace(/^Basic /, '') === btoa(user.username+':'+user.password)) {
-          return [
-            200,
-            { authenticated: true }
-          ];
+        this.req.headers.authorization.replace(/^Basic /, '') === btoa(user.username + ':' + user.password)) {
+      return [
+        200,
+        { authenticated: true }
+      ];
     }
 
     return [
@@ -143,7 +145,7 @@ Echo
 Echo
   .get('/digest-auth')
   .query(true)
-  .reply(function (uri, body) {
+  .reply(function (_uri, body) {
     var authInfo,
       A0,
       A1,
@@ -162,7 +164,7 @@ Echo
         }
       ];
 
-    if(!this.req.headers.authorization) { return unauthorizedResponse; }
+    if (!this.req.headers.authorization) { return unauthorizedResponse; }
 
     authInfo = this.req.headers.authorization.replace(/^Digest /, '');
     authInfo = util.authInfoParser(authInfo);
@@ -176,31 +178,32 @@ Echo
       A1 = A0 + COLON + authInfo.nonce + COLON + authInfo.cnonce;
     }
     else {
-        A1 = authInfo.username + COLON + user.realm + COLON + user.password;
+      A1 = authInfo.username + COLON + user.realm + COLON + user.password;
     }
 
     if (authInfo.qop === AUTH_INT) {
-        A2 = 'GET' + COLON + authInfo.uri + COLON + crypto.MD5(body);
+      A2 = 'GET' + COLON + authInfo.uri + COLON + crypto.MD5(body);
     }
     else {
-        A2 = 'GET' + COLON + authInfo.uri;
+      A2 = 'GET' + COLON + authInfo.uri;
     }
 
     A1 = crypto.MD5(A1).toString();
     A2 = crypto.MD5(A2).toString();
 
     if (authInfo.qop === AUTH || authInfo.qop === AUTH_INT) {
-        reqDigest = crypto.MD5([A1, authInfo.nonce, authInfo.nc, authInfo.cnonce, authInfo.qop, A2].join(COLON)).toString();
+      reqDigest = crypto.MD5([A1, authInfo.nonce, authInfo.nc, authInfo.cnonce, authInfo.qop, A2]
+        .join(COLON)).toString();
     }
     else {
-        reqDigest = crypto.MD5([A1, authInfo.nonce, A2].join(COLON)).toString();
+      reqDigest = crypto.MD5([A1, authInfo.nonce, A2].join(COLON)).toString();
     }
 
     if (reqDigest === authInfo.response) {
       return [
         200,
         { authenticated: true }
-      ]
+      ];
     }
 
     return unauthorizedResponse;
@@ -210,10 +213,11 @@ Echo
 Echo
   .get('/auth/hawk')
   .query(true)
-  .reply(function (uri, body, callback) {
+  .reply(function (uri, _body, callback) {
     // the request object of the nock is an altered one, hence the following fixes
     this.req.url = uri;
-    this.req.headers.host === 'postman-echo.com' && (this.req.connection.encrypted = true); // false while testing using localhost
+    this.req.headers.host === 'postman-echo.com' && (this.req.connection.encrypted = true);
+    // false while testing using localhost
 
     Hawk.server.authenticate(this.req, function () {
       return {
@@ -222,22 +226,22 @@ Echo
         user: HAWK_AUTH_USER
       };
     }).then(function () {
-      callback(null,[
+      callback(null, [
         200,
         {
           message: 'Hawk Authentication Successful'
         }
-      ])
-    })
-    .catch(function (err) {
-      callback(null, [
-        401,
-        'rETRY',
-        {
-          'Server-Authorization': Hawk.server.header(err.credentials, err.artifacts)
-        }
       ]);
-    });
+    })
+      .catch(function (err) {
+        callback(null, [
+          401,
+          'rETRY',
+          {
+            'Server-Authorization': Hawk.server.header(err.credentials, err.artifacts)
+          }
+        ]);
+      });
   });
 
 // OAuth1.0 (verify signature)
@@ -258,62 +262,63 @@ Echo
         .sort()
         .reduce((res, key) => {
           res.push(`${key}=${parameters[key]}`);
+
           return res;
-        },[])
+        }, [])
         .join('&'),
       baseString = `${this.req.method}&${encodeURIComponent(baseUri)}&${encodeURIComponent(normalizedParamString)}`,
 
-      signingKey=`${encodeURIComponent(OAUTH_KEY)}&`, // since there is no oauth_token, nothing follows '&'
+      signingKey = `${encodeURIComponent(OAUTH_KEY)}&`, // since there is no oauth_token, nothing follows '&'
 
       oauthSignature = encodeURIComponent(crypto.enc.Base64.stringify(crypto.HmacSHA1(baseString, signingKey)));
 
-      if (oauthSignature === parameters[OAUTH_SIGNATURE]){
-        return [
-          200,
-          {
-            status: "pass",
-            message: "OAuth-1.0a signature verification was successful"
-          }
-        ]
+    if (oauthSignature === parameters[OAUTH_SIGNATURE]) {
+      return [
+        200,
+        {
+          status: 'pass',
+          message: 'OAuth-1.0a signature verification was successful'
+        }
+      ];
+    }
+
+    return [
+      401,
+      {
+        status: 'fail',
+        message: 'HMAC-SHA1 verification failed',
+        base_uri: baseUri,
+        normalized_param_string: normalizedParamString,
+        base_string: baseString,
+        signing_key: signingKey
       }
-      else{
-        return [
-          401,
-          {
-            status: "fail",
-            message: "HMAC-SHA1 verification failed",
-            base_uri: baseUri,
-            normalized_param_string: normalizedParamString,
-            base_string: baseString,
-            signing_key: signingKey
-          }
-        ]
-      };
+    ];
   });
 
 
-/***** Cookie Manipulation *****/
+/** *** Cookie Manipulation *****/
 
 // Set Cookies
 Echo
   .get('/cookies/set')
   .query(true)
-  .reply(function (uri, body) {
+  .reply(function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString);
-      queries['sails.sid'] = '0123456789';//else, the default set cookies are replaced
 
-      return [
-        302,
-        'Found. Redirecting to /cookies',
-        {
-          'Location': '/cookies',
-          'set-cookie': _.transform(queries, function (result, value, key) {
-              result.push(`${key}=${value}; Path=/`);
-            }, [])
-        }
-      ]
+    queries['sails.sid'] = '0123456789';// else, the default set cookies are replaced
+
+    return [
+      302,
+      'Found. Redirecting to /cookies',
+      {
+        Location: '/cookies',
+        'set-cookie': _.transform(queries, function (result, value, key) {
+          result.push(`${key}=${value}; Path=/`);
+        }, [])
+      }
+    ];
   });
 
 // Get Cookies
@@ -321,49 +326,49 @@ Echo
 Echo
   .get('/cookies')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var cookieString = this.req.headers.cookie || '',
       cookies = cookie.parse(cookieString);
 
-      return {
-        cookies: cookies
-      };
+    return {
+      cookies
+    };
   });
 
 // Delete Cookies
 Echo
   .get('/cookies/delete')
   .query(true)
-  .reply(function (uri, body) {
+  .reply(function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString);
 
-      return [
-        302,
-        'Found. Redirecting to /cookies',
-        {
-          'Location': '/cookies',
-          'set-cookie': _.transform(queries, function (result, value, key) {
-              result.push(`${key}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
-            }, [])
-        }
-      ]
+    return [
+      302,
+      'Found. Redirecting to /cookies',
+      {
+        Location: '/cookies',
+        'set-cookie': _.transform(queries, function (result, value, key) {
+          result.push(`${key}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+        }, [])
+      }
+    ];
   });
 
 
-/***** Utilities *****/
+/** *** Utilities *****/
 
 // Response Status Code
 Echo
   .get(/^\/status\/[1-5][0-9][0-9]$/)
   .query(true)
   .reply(function (uri) {
-    const status = parseInt(uri.substr(-3));
+    const status = parseInt(uri.substr(-3), 10);
 
     return [status, {
       status
-    }]
+    }];
   });
 
 // Streamed Response
@@ -381,25 +386,26 @@ Echo
       }, null, 2),
 
       body = new Readable({
-        read(){
-          frequency-- ? this.push(singleResponse):this.push(null);
+        read () {
+          frequency-- ? this.push(singleResponse) : this.push(null);
         }
       });
 
-      return body;
+    return body;
   }, {
-    'Transfer-Encoding': 'chunked',
+    'Transfer-Encoding': 'chunked'
   });
 
 // Delay Response
 Echo
   .get(/^\/delay\/\d+$/)
   .query(true)
-  .reply(200, function (uri, body, callback) {
+  .reply(200, function (uri, _body, callback) {
     const delay = uri.split('/')[2];
+
     setTimeout(() => {
-      callback(null, {delay})
-    }, parseInt(delay * 1000));
+      callback(null, { delay });
+    }, parseInt(delay * 1000, 10));
   });
 
 // Get UTF8 Encoded Response
@@ -408,21 +414,22 @@ Echo
   .query(true)
   .reply(200, cachedFiles.utf8Text, {
     'content-type': 'text/html; charset=utf-8',
-    'transfer-encoding': 'chunked',
+    'transfer-encoding': 'chunked'
   });
 
 // GZip Compressed Response
 Echo
   .get('/gzip')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var data = {
         gzipped: true,
         headers: this.req.headers,
         method: 'GET'
       },
       buffer = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
-      return zlib.gzipSync(buffer);
+
+    return zlib.gzipSync(buffer);
   }, {
     'Content-Encoding': 'gzip',
     'Content-Type': 'application/json; charset=utf-8'
@@ -432,17 +439,18 @@ Echo
 Echo
   .get('/deflate')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var data = {
         deflated: true,
         headers: this.req.headers,
         method: 'GET'
       },
       buffer = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
-      return zlib.deflateSync(buffer);
+
+    return zlib.deflateSync(buffer);
   }, {
     'Content-Encoding': 'deflate',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json; charset=utf-8'
   });
 
 // IP address in JSON format
@@ -450,11 +458,11 @@ Echo
   .get('/ip')
   .query(true)
   .reply(200, {
-    "ip": "127.0.0.1"     // localhost IP for nocked requests
+    ip: '127.0.0.1' // localhost IP for nocked requests
   });
 
 
-/***** Utilities / Date and Time *****/
+/** *** Utilities / Date and Time *****/
 
 // Current UTC time
 Echo
@@ -466,71 +474,72 @@ Echo
 Echo
   .get('/time/valid')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        valid: createdMoment.isValid()
-      };
+    return {
+      valid: createdMoment.isValid()
+    };
   });
 
 // Format timestamp
 Echo
   .get('/time/format')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        format: createdMoment.format(queries.format)
-      };
+    return {
+      format: createdMoment.format(queries.format)
+    };
   });
 
 // Extract timestamp unit
 Echo
   .get('/time/unit')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        unit: createdMoment.get(queries.unit || 'year')
-      };
+    return {
+      unit: createdMoment.get(queries.unit || 'year')
+    };
   });
 
 // Time addition
 Echo
   .get('/time/add')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       addParams = _.pick(queries, ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']),
       createdMoment = moment.utc(momentParams.timestamp, momentParams.format, momentParams.strict);
-      return {
-        sum: createdMoment.add(addParams).toString()
-      };
+
+    return {
+      sum: createdMoment.add(addParams).toString()
+    };
   });
 
 // Time subtraction
 Echo
   .get('/time/subtract')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
@@ -538,112 +547,112 @@ Echo
       addParams = _.pick(queries, ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']),
       createdMoment = moment.utc(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        difference: createdMoment.subtract(addParams).toString()
-      };
+    return {
+      difference: createdMoment.subtract(addParams).toString()
+    };
   });
 
 // Start of time
 Echo
   .get('/time/start')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment.utc(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        start: createdMoment.startOf(queries.unit).toString()
-      };
+    return {
+      start: createdMoment.startOf(queries.unit).toString()
+    };
   });
 
 // Object representation
 Echo
   .get('/time/object')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return createdMoment.toObject();
+    return createdMoment.toObject();
   });
 
 // Before comparisons
 Echo
   .get('/time/before')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        before: createdMoment.isBefore(queries.target)
-      };
+    return {
+      before: createdMoment.isBefore(queries.target)
+    };
   });
 
 // After comparisons
 Echo
   .get('/time/after')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        after: createdMoment.isAfter(queries.target)
-      };
+    return {
+      after: createdMoment.isAfter(queries.target)
+    };
   });
 
 // Between timestamps
 Echo
   .get('/time/between')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        between: createdMoment.isBetween(queries.start, queries.end, queries.unit)
-      };
+    return {
+      between: createdMoment.isBetween(queries.start, queries.end, queries.unit)
+    };
   });
 
 // Leap year check
 Echo
   .get('/time/leap')
   .query(true)
-  .reply(200, function (uri, body) {
+  .reply(200, function () {
     var queryIndex = this.req.path.indexOf('?'),
       queryString = queryIndex !== -1 ? this.req.path.slice(queryIndex + 1) : '',
       queries = qs.parse(queryString),
       momentParams = _.pick(queries, ['strict', 'locale', 'format', 'timestamp']),
       createdMoment = moment(momentParams.timestamp, momentParams.format, momentParams.locale, momentParams.strict);
 
-      return {
-        leap: createdMoment.isLeapYear()
-      };
+    return {
+      leap: createdMoment.isLeapYear()
+    };
   });
 
-/***** Newman sample echo *****/
+/** *** Newman sample echo *****/
 Echo
   .get(/^\/type\/(html|xml)$/)
   .query({
-    source: "newman-sample-github-collection"
+    source: 'newman-sample-github-collection'
   })
-  .reply(function(uri){
+  .reply(function (uri) {
     var queryIndex = this.req.path.indexOf('?'),
       type = uri.slice(0, queryIndex).split('/')[2];
 
@@ -651,7 +660,7 @@ Echo
       200,
       cachedFiles.type,
       {
-        'content-type':`application/${type}; charset=utf-8`
+        'content-type': `application/${type}; charset=utf-8`
       }
     ];
   });

@@ -1,11 +1,12 @@
-var express = require('express');
-var app = module.exports = express();
-var echo = require('.');
+require('.');
+var express = require('express'),
+  app = module.exports = express(),
 
-var proxy = require('http-proxy').createProxyServer({
-  host: 'https://postman-echo.com',
-  // port: 80
-});
+  proxy = require('http-proxy').createProxyServer({
+    host: 'https://postman-echo.com'
+    // port: 80
+  });
+
 app.use('/', function (req, res, next) {
   proxy.web(req, res, {
     target: 'https://postman-echo.com'
@@ -13,5 +14,5 @@ app.use('/', function (req, res, next) {
 });
 
 app.listen(3030, function () {
-  console.log('Listening!');
+  console.info('Listening!');
 });
