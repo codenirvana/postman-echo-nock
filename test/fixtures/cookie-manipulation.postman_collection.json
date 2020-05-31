@@ -1,0 +1,457 @@
+{
+	"info": {
+		"_postman_id": "4ec2916a-f1ca-4547-ac18-5e82f7438c71",
+		"name": "Cookie Manipulation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Set Cookies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('response should be 200 or 302', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+							"});",
+							"",
+							"pm.test('the \"foo1\" cookie has correct value', function () {",
+							"    pm.expect(pm.cookies.toObject()).to.have.property('foo1', 'bar1');",
+							"});",
+							"",
+							"pm.test('the \"foo2\" cookie has correct value', function () {",
+							"    pm.expect(pm.cookies.toObject()).to.have.property('foo2', 'bar2');",
+							"});",
+							"",
+							"// response code could be either a 200 or a redirection based on the settings of ",
+							"// the http client. hence we need to handle both cases",
+							"pm.test('response body should be valid', function () {",
+							"    if (pm.response.code === 200) {",
+							"        pm.response.to.have.jsonBody('cookies.foo1', 'bar1')",
+							"            .and.have.jsonBody('cookies.foo2', 'bar2');",
+							"    }",
+							"    else {",
+							"        pm.response.to.have.body('Found. Redirecting to /cookies');",
+							"    }",
+							"});"
+						],
+						"id": "f24c4bde-e40a-4bc3-a537-39d11bb62896"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/cookies/set?foo1=bar1&foo2=bar2",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"cookies",
+						"set"
+					],
+					"query": [
+						{
+							"key": "foo1",
+							"value": "bar1"
+						},
+						{
+							"key": "foo2",
+							"value": "bar2"
+						}
+					]
+				},
+				"description": "The cookie setter endpoint accepts a list of cookies and their values as part of URL parameters of a `GET` request. These cookies are saved and can be subsequently retrieved or deleted. The response of this request returns a JSON with all cookies listed.\n\nTo set your own set of cookies, simply replace the URL parameters \"foo1=bar1&foo2=bar2\" with your own set of key-value pairs."
+			},
+			"response": [
+				{
+					"name": "Cookies",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "51",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 29 Oct 2015 06:15:28 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"cookies\":{\"foo1\":\"bar\",\"foo2\":\"bar\"}}"
+				}
+			]
+		},
+		{
+			"name": "Get Cookies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('the \"foo1\" cookie has correct value', function () {",
+							"    pm.expect(pm.cookies.toObject()).to.have.property('foo1', 'bar1');",
+							"});",
+							"",
+							"pm.test('the \"foo2\" cookie has correct value', function () {",
+							"    pm.expect(pm.cookies.toObject()).to.have.property('foo2', 'bar2');",
+							"});",
+							"",
+							"pm.test('response body should be valid', function () {",
+							"    pm.response.to.have.jsonBody('cookies.foo1', 'bar1');",
+							"    pm.response.to.have.jsonBody('cookies.foo2', 'bar2');",
+							"});"
+						],
+						"id": "59b6d05e-2470-49df-a8e8-3c66bdddeaea"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/cookies",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"cookies"
+					]
+				},
+				"description": "Use this endpoint to get a list of all cookies that are stored with respect to this domain. Whatever key-value pairs that has been previously set by calling the \"Set Cookies\" endpoint, will be returned as response JSON."
+			},
+			"response": [
+				{
+					"name": "Cookies",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "46",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 29 Oct 2015 06:16:29 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"cookies\":{\"foo2\":\"bar\"}}"
+				}
+			]
+		},
+		{
+			"name": "Delete Cookies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('response should be 200 or 302', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+							"});",
+							"",
+							"pm.test('the \"foo1\" cookie should not be present', function () {",
+							"    pm.expect(pm.cookies.toObject()).to.not.have.property('foo1');",
+							"});",
+							"",
+							"pm.test('the \"foo2\" cookie should not be present', function () {",
+							"    pm.expect(pm.cookies.toObject()).to.not.have.property('foo2');",
+							"});",
+							"",
+							"// response code could be either a 200 or a redirection based on the settings of ",
+							"// the http client. hence we need to handle both cases",
+							"pm.test('response body should be valid', function () {",
+							"    if (pm.response.code === 200) {",
+							"        pm.response.to.not.have.jsonBody('cookies.foo1');",
+							"        pm.response.to.not.have.jsonBody('cookies.foo2');",
+							"    }",
+							"    else {",
+							"        pm.response.to.have.body('Found. Redirecting to /cookies');",
+							"    }",
+							"});"
+						],
+						"id": "44c85de2-5126-4654-8109-a4e59e684b4d"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/cookies/delete?foo1&foo2",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"cookies",
+						"delete"
+					],
+					"query": [
+						{
+							"key": "foo1",
+							"value": ""
+						},
+						{
+							"key": "foo2",
+							"value": ""
+						}
+					]
+				},
+				"description": "One or more cookies that has been set for this domain can be deleted by providing the cookie names as part of the URL parameter. The response of this request is a JSON containing the list of currently set cookies."
+			},
+			"response": [
+				{
+					"name": "Cookies Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "46",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 29 Oct 2015 06:16:00 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"cookies\":{\"foo2\":\"bar\"}}"
+				}
+			]
+		}
+	],
+	"protocolProfileBehavior": {}
+}

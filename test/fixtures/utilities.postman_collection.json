@@ -1,0 +1,580 @@
+{
+	"info": {
+		"_postman_id": "9f1eed70-8767-4013-b8d6-dd126dde090e",
+		"name": "Utilities",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Response Status Code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has valid json body\", function () {",
+							"    pm.response.to.have.jsonBody('status');",
+							"});",
+							"",
+							"// additional sanity tests",
+							"pm.test(\"status in response body must match the one in request\", function () {",
+							"    pm.response.to.have.jsonBody('status', Number(_.get(pm.request, 'url.path[1]')));",
+							"});"
+						],
+						"id": "ee3e2e12-980a-42e6-a126-d5a94196f4d5"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/status/200",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"status",
+						"200"
+					]
+				},
+				"description": "This endpoint allows one to instruct the server which status code to respond with.\n\nEvery response is accompanied by a status code. The status code provides a summary of the nature of response sent by the server. For example, a status code of `200` means everything is okay with the response and a code of `404` implies that the requested URL does not exist on server. \nA list of all valid HTTP status code can be found at the [List of Status Codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) wikipedia article. When using Postman, the response status code is described for easy reference.\n\nNote that if an invalid status code is requested to be sent, the server returns a status code of `400 Bad Request`."
+			},
+			"response": [
+				{
+					"name": "200",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://echo.getpostman.com/status/200",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"status",
+								"200"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "14",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Mar 2016 11:58:47 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"e-1056260003\"",
+							"name": "ETag",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"hostOnly": false,
+							"httpOnly": false,
+							"domain": ".getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": false,
+							"value": "yes",
+							"key": "getpostmanlogin"
+						},
+						{
+							"expires": "Invalid Date",
+							"hostOnly": false,
+							"httpOnly": false,
+							"domain": ".getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": false,
+							"value": "df0c0256028d7ec4d641f766104a9571a8e249685bbc667d7cee030bbf44d3209495c70c03248e31e678a93812591d5e12187a8e99bf6bc5e80c40903f6ff6226938f24e413c0ffa613a7372064ec44a8594e8d3ede6945e34394f369573feeebc4a73a3e24b8c9ac18a53704addb5fd3f71f1ede488ff551feb059e9c1fb208164814e45e0312c4df8ea6e83c26702f42ae634c6afbe82d57c857bbf5598b5527961c1c28688dc2580070a4389f0cf4ec0a179b5b9c11b2ecbaa5460d374065bf5c7a3add9505df0fa89acb9f227f05ed2d4c6b58c39d6d728bd49f6f323ae67d4a75882aa7682f5d6fc5b981ba411d94aa93970bfaefa1953a73e440d50d012b5f288975c888e2345ee7777e746fb5aed3a7b2dbc087c6456621aa78c24a3c17c5f96cf59844933249a352f631e2008cffac6faf06d0e253dcc01cf0067bf56c1fbc5ed61fec1861b60c5accf35ffc2e56154a113004fa1db9d7171c3af8fc063918554092f5",
+							"key": "postman.sid"
+						},
+						{
+							"expires": "Invalid Date",
+							"hostOnly": false,
+							"httpOnly": false,
+							"domain": ".echo.getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": false,
+							"value": "GA1.3.1703443399.1459422978",
+							"key": "_ga"
+						},
+						{
+							"expires": "Invalid Date",
+							"hostOnly": true,
+							"httpOnly": true,
+							"domain": "echo.getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": true,
+							"value": "s%3AvuHU0EKeDbyNjVrEc7U30dMPzVu8CRaD.GOV1H9olcVzXqrwqP%2BC%2B6MVj2UczXivcN00jgPoDYfs",
+							"key": "sails.sid"
+						}
+					],
+					"body": "{\"status\":200}"
+				}
+			]
+		},
+		{
+			"name": "Streamed Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has chunked transfer encoding header\", function () {",
+							"    pm.response.to.have.header('transfer-encoding', 'chunked');",
+							"});"
+						],
+						"id": "7b36499a-3c0d-412f-8022-d07e6421a57a"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/stream/5",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"stream",
+						"5"
+					]
+				},
+				"description": "This endpoint allows one to recieve streaming http response using [chunked transfer encoding](https://en.wikipedia.org/wiki/Chunked_transfer_encoding) of a configurable length.\n\nA streaming response does not wait for the entire response to be generated on server before flushing it out. This implies that for a fairly large response, parts of it can be streamed to the requestee as and when it is generated on server. The client can then take actions of processing this partially received data."
+			},
+			"response": []
+		},
+		{
+			"name": "Delay Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var _ = require('lodash');",
+							"",
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has valid json body\", function () {",
+							"    pm.response.to.have.jsonBody('delay');",
+							"});",
+							"",
+							"// additional sanity tests",
+							"pm.test(\"request must have a valid delay\", function () {",
+							"    pm.expect(Number(_.get(pm.request, 'url.path[1]'))).to.be.above(0).and.below(10);",
+							"});",
+							"pm.test(\"response should take more time than the delay specified\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.above(Number(_.get(pm.request, 'url.path[1]')));",
+							"});"
+						],
+						"id": "e844ffc1-24eb-4092-b6fc-c3bdb6a5ca6c"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/delay/2",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"delay",
+						"2"
+					]
+				},
+				"description": "Using this endpoint one can configure how long it takes for the server to come back with a response. Appending a number to the URL defines the time (in seconds) the server will wait before responding.\n\nNote that a maximum delay of 10 seconds is accepted by the server."
+			},
+			"response": [
+				{
+					"name": "success-response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://echo.getpostman.com/delay/3",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"delay",
+								"3"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Expose-Headers",
+							"value": "",
+							"name": "Access-Control-Expose-Headers",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "13",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 02 Jan 2017 09:19:03 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"d-t/L/D5c0SDl+MoXtKdSVOg\"",
+							"name": "ETag",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.10.1",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"httpOnly": true,
+							"domain": "echo.getpostman.com",
+							"path": "/",
+							"secure": false,
+							"value": "s%3AYjUiFBtGiJVL2a-qzZQZ1DFlAMhgXN9O.WaAjRUV0OteZxwmhbNibuB7VKse068JJIh6PwLQUKmQ",
+							"key": "sails.sid"
+						}
+					],
+					"body": "{\"delay\":\"3\"}"
+				}
+			]
+		},
+		{
+			"name": "Get UTF8 Encoded Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has charset in content-type header\", function () {",
+							"    pm.response.to.have.header('content-type', 'text/html; charset=utf-8');",
+							"});",
+							"",
+							"pm.test(\"response has chunked transfer encoding header\", function () {",
+							"    pm.response.to.have.header('transfer-encoding', 'chunked');",
+							"});"
+						],
+						"id": "ad215f97-70d1-4ba2-9b60-d5a2296fb6f9"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/encoding/utf8",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"encoding",
+						"utf8"
+					]
+				},
+				"description": "If a response of an endpoint requires to send data beyond the basic English / ASCII character set, the `charset` parameter in the `Content-Type` response header defines the character encoding policy.\n\nThis endpoint returns an `UTF8` character encoded response body with text in various languages such as Greek, Latin, East Asian, etc. Postman can interpret the character encoding and use appropriate methods to display the character set in responses."
+			},
+			"response": []
+		},
+		{
+			"name": "GZip Compressed Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9052b9de-78e6-4bb7-a6ad-01608622be24",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has valid json body\", function () {",
+							"    pm.response.to.have.jsonBody('gzipped', true);",
+							"});",
+							"",
+							"pm.test('response headers should indicate valid content encoding', function  () {",
+							"    pm.response.to.have.header('content-encoding', 'gzip')",
+							"        .and.have.header('content-type', 'application/json; charset=utf-8');",
+							"});",
+							"",
+							"pm.test('requesting http client should accept compressed response', function () {",
+							"    pm.expect(pm.response.json()).to.have.nested.property('headers.accept-encoding')",
+							"        .and.to.match(/.*gzip.*/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/gzip",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"gzip"
+					]
+				},
+				"description": "This endpoint returns the response using [gzip compression algoritm](https://en.wikipedia.org/wiki/Gzip).\nThe uncompressed response is a JSON string containing the details of the request sent by the client. For this endpoint to work, one should request with `Accept-encoding` header containing `gzip` as part of its value. Postman supports gzip, deflate and SDCH decoding and automatically sends them as part of the request.\n\nHTTP Compression allows the server to send responses in a compressed format, which is uncompressed by the client before processing. This reduces network bandwidth consumption at the cost of increase in CPU usage.\nTo know more about this, refer the [HTTP Compression](https://en.wikipedia.org/wiki/HTTP_compression) wikipedia article."
+			},
+			"response": []
+		},
+		{
+			"name": "Deflate Compressed Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "75989481-8db3-4cdc-aaa3-e022465d8b12",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has valid json body\", function () {",
+							"    pm.response.to.have.jsonBody('deflated', true);",
+							"});",
+							"",
+							"pm.test('response headers should indicate valid content encoding', function  () {",
+							"    pm.response.to.have.header('content-encoding', 'deflate')",
+							"        .and.have.header('content-type', 'application/json; charset=utf-8');",
+							"});",
+							"",
+							"pm.test('requesting http client should accept compressed response', function () {",
+							"    pm.expect(pm.response.json()).to.have.nested.property('headers.accept-encoding')",
+							"        .and.to.match(/.*deflate.*/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/deflate",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"deflate"
+					]
+				},
+				"description": "This endpoint returns the response using [deflate compression algoritm](https://en.wikipedia.org/wiki/DEFLATE). \nThe uncompressed response is a JSON string containing the details of the request sent by the client. For this endpoint to work, one should request with `Accept-encoding` header containing `deflate` as part of its value. Postman supports gzip, deflate and SDCH decoding and automatically sends them as part of the request.\n\nHTTP Compression allows the server to send responses in a compressed format, which is uncompressed by the client before processing. This reduces network bandwidth consumption at the cost of increase in CPU usage.\nTo know more about this, refer the [HTTP Compression](https://en.wikipedia.org/wiki/HTTP_compression) wikipedia article."
+			},
+			"response": []
+		},
+		{
+			"name": "IP address in JSON format",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has valid json body\", function () {",
+							"    pm.response.to.have.jsonBody('ip');",
+							"});",
+							"",
+							"pm.test(\"response must return a valid ip address\", function () {",
+							"    pm.expect(pm.response.json().ip).to",
+							"        // a really gnarly regular expression to ensure that ip address is in correct format",
+							"        .match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);",
+							"});"
+						],
+						"id": "08857fc1-667a-416f-ae6f-48a10c531e9a"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/ip",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"ip"
+					]
+				},
+				"description": "A simple `GET` request to return the IP address of the source request in the following `JSON` format:\n\n```json\n{\n  ip: \"request-ip-address\"\n}\n```"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

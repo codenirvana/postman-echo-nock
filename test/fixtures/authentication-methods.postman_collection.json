@@ -1,0 +1,912 @@
+{
+	"info": {
+		"_postman_id": "3c900de5-d5ab-4e71-85d2-cfa57d0f59e6",
+		"name": "Authentication Methods",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Basic Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body has json saying 'authenticated'\", function () {",
+							"    pm.response.to.have.jsonBody('authenticated', true);",
+							"});"
+						],
+						"id": "955d9876-25a5-4773-b0ab-25d02296e60b"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "postman",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/basic-auth",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"basic-auth"
+					]
+				},
+				"description": "This endpoint simulates a **basic-auth** protected endpoint. \nThe endpoint accepts a default username and password and returns a status code of `200 ok` only if the same is provided. \nOtherwise it will return a status code `401 unauthorized`.\n\n> Username: `postman`\n> \n> Password: `password`\n\nTo use this endpoint, send a request with the header `Authorization: Basic cG9zdG1hbjpwYXNzd29yZA==`. \nThe cryptic latter half of the header value is a base64 encoded concatenation of the default username and password. \nUsing Postman, to send this request, you can simply fill in the username and password in the \"Authorization\" tab and Postman will do the rest for you.\n\nTo know more about basic authentication, refer to the [Basic Access Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) wikipedia article.\nThe article on [authentication helpers](https://www.getpostman.com/docs/helpers#basic-auth?source=echo-collection-app-onboarding) elaborates how to use the same within the Postman app."
+			},
+			"response": [
+				{
+					"name": "200",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "42",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 31 Oct 2015 06:38:25 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"authenticated\":true}"
+				}
+			]
+		},
+		{
+			"name": "DigestAuth Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1beb442f-f856-4891-95b1-95bbb9b0b766",
+						"exec": [
+							"tests[\"response code is 200\"] = responseCode.code === 200;",
+							"tests[\"body contains authenticated\"] = responseBody.has(\"authenticated\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "realm",
+							"value": "Users",
+							"type": "string"
+						},
+						{
+							"key": "nonce",
+							"value": "5jfxIX7W2TzewbJwZuQRtsG8HfjZZp8X",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "postman",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "nonceCount",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "clientNonce",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "opaque",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "qop",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Digest username=\"postman\", realm=\"Users\", nonce=\"ni1LiL0O37PRRhofWdCLmwFsnEtH1lew\", uri=\"/digest-auth\", response=\"254679099562cf07df9b6f5d8d15db44\", opaque=\"\""
+					}
+				],
+				"url": {
+					"raw": "https://postman-echo.com/digest-auth",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"digest-auth"
+					]
+				},
+				"description": "This endpoint sends a hashed Digest Authorization header to gain access to a valid `200 Ok` response code. In Postman, it uses the stored [global variables](https://www.getpostman.com/docs/environments#gloval-variables?source=echo-collection-app-onboarding), `echo_digest_realm` and `echo_digest_nonce`, to generate the hashed authorisation header.\n\nWithin Postman, for this request to successfully authenticate, running the previous request \"DigestAuth Request\" stores the relevant information within the global variables."
+			},
+			"response": [
+				{
+					"name": "200",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "42",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 29 Oct 2015 06:17:51 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"authenticated\":true}"
+				}
+			]
+		},
+		{
+			"name": "Hawk Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b89fcb2-67d7-46ea-91b6-e1dbc62558b4",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "hawk",
+					"hawk": [
+						{
+							"key": "authId",
+							"value": "dh37fgj492je",
+							"type": "string"
+						},
+						{
+							"key": "authKey",
+							"value": "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "sha256",
+							"type": "string"
+						},
+						{
+							"key": "user",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "nonce",
+							"value": "RZKGNz",
+							"type": "string"
+						},
+						{
+							"key": "timestamp",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/auth/hawk",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"auth",
+						"hawk"
+					]
+				},
+				"description": "This endpoint is a Hawk Authentication protected endpoint. [Hawk authentication](https://github.com/hueniverse/hawk) is a widely used protocol for protecting API endpoints. One of Hawk's main goals is to enable HTTP authentication for services that do not use TLS (although it can be used in conjunction with TLS as well).\n\nIn order to use this endpoint, select the \"Hawk Auth\" helper inside Postman, and set the following values:\n\nHawk Auth ID: `dh37fgj492je`\n\nHawk Auth Key: `werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn`\n\nAlgorithm: `sha256`\n\nThe rest of the values are optional, and can be left blank. Hitting send should give you a response with a status code of 200 OK."
+			},
+			"response": [
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"name": "Authorization",
+								"value": "Hawk id=\"dh37fgj492je\", ts=\"1459422734\", nonce=\"XiwiCU\", mac=\"KzMHk67BYCC9zZqRy5hRdWFEFLHX5bNlRWGdmOAWKp0=\""
+							}
+						],
+						"url": {
+							"raw": "https://echo.getpostman.com/auth/hawk",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"auth",
+								"hawk"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Mar 2016 11:12:16 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Server-Authorization",
+							"value": "Hawk mac=\"vRrUzDdcHu2NaNts/r4zg2xmXMdX8wPiTGTM398BDRg=\", hash=\"qmtflETMybaZiOQ2dLT17yiRunFT5OCIxZRZ0boQaiE=\"",
+							"name": "Server-Authorization",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						},
+						{
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"name": "transfer-encoding",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"hostOnly": false,
+							"httpOnly": false,
+							"domain": ".getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": false,
+							"value": "yes",
+							"key": "getpostmanlogin"
+						},
+						{
+							"expires": "Invalid Date",
+							"hostOnly": false,
+							"httpOnly": false,
+							"domain": ".getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": false,
+							"value": "9f887f3b7f14b8c29ac4dc4109381b0b89a76e785c7b34251d6c8025b41b24013d2aa49f40e2deac19cbf0594dd984169455534d91ff98d4d1868d67ac857017629f137926e3a04a616bb83a2fb5ab9e6cbea9579ed5d5c1155d47545d72aad5be99f4abd0a7130805b3807d70cd507171dbe9d950d8e35a853f9ec075f5a767c95df4d57f7d521b66605b3bda3801700e26e651d1129c798b729ee3b91702d43ae64ab226c3f426893753def772c15442a7552dc84a3c773d6099a50b0a6af940b64c8176fedfcecd5fc31ccfc3bbc0124bfdaa0d62e4252d4aafb46a3c10963d12391e1fa97a1c0f19a636f57a3ac8cc35567d1cb6cb53b77f8adde3f6754a765596d7d00bdeb9acb5cc8d115e7c3f50ec3228e34d3e6c7464e9039b01868e03d10e9f87772397602453e9e91205de7b86021fad06eb26e69298e99ff1597a670faeb310f8c092041d544851de84f2bee89a92123da6eea286210524035c85361e2af42166a6",
+							"key": "postman.sid"
+						},
+						{
+							"expires": "Invalid Date",
+							"hostOnly": true,
+							"httpOnly": true,
+							"domain": "echo.getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": true,
+							"value": "s%3AryJV7v-PE4PuTjBK6nH5XOynQ4atuATV.n17KcaLhVmV8TBHNLwdwXgGR7lmqs3i478WPlTbRgZ4",
+							"key": "sails.sid"
+						}
+					],
+					"body": "{\"status\":\"pass\",\"message\":\"Hawk Authentication successful\"}"
+				}
+			]
+		},
+		{
+			"name": "OAuth1.0 (verify signature)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body has json saying passed 'status'\", function () {",
+							"    pm.response.to.have.jsonBody('status', 'pass');",
+							"});"
+						],
+						"id": "3a790666-e91d-46f0-8f4b-7424cc763f29"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "consumerKey",
+							"value": "RKCGzna7bv9YD57c",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "D+EdQ-gs$-%@2Nu7",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA1",
+							"type": "string"
+						},
+						{
+							"key": "timestamp",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "nonce",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "realm",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addParamsToHeader",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/oauth1",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"oauth1"
+					]
+				},
+				"description": "OAuth1.0a is a specification that defines a protocol that can be used by one\nservice to access \"protected\" resources (endpoints) on another service. A\nmajor part of OAuth1.0 is HTTP Request Signing. This endpoint allows you to \ncheck whether the request calculation works properly in the client. \n\nThe endpoint supports the HTTP ``Authorization`` header. In case the signature\nverification fails, the endpoint provides the four debug values,\n\n* ``base_uri``\n* ``normalized_param_string``\n* ``base_string``\n* ``signing_key``\n\nFor more details about these parameters, check the [OAuth1.0a Specification](http://oauth.net/core/1.0a/)\n\nIn order to use this endpoint, you can set the following values:\n\n> Consumer Key: ``RKCGzna7bv9YD57c``\n>\n> Consumer Secret: ``D+EdQ-gs$-%@2Nu7``\n\nIf you are using Postman, also check the \"Add params to header\" and \n\"Auto add parameters\" boxes."
+			},
+			"response": [
+				{
+					"name": "401",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"name": "Authorization",
+								"value": "OAuth oauth_consumer_key=\"RKCGzna7bv9YD57c_wrong\",oauth_signature_method=\"HMAC-SHA1\",oauth_timestamp=\"1472121295\",oauth_nonce=\"8LTsU2\",oauth_version=\"1.0\",oauth_signature=\"tSUexpY%2B7EhSY7cFXiFN5EMx2zw%3D\""
+							}
+						],
+						"url": {
+							"raw": "https://echo.getpostman.com/oauth1",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"oauth1"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Expose-Headers",
+							"value": "",
+							"name": "Access-Control-Expose-Headers",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "536",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Aug 2016 10:34:55 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"218-SGnurnTsu5qV5cCYWxsJlg\"",
+							"name": "ETag",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.8.1",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"status\":\"fail\",\"message\":\"HMAC-SHA1 verification failed\",\"base_uri\":\"https://echo.getpostman.com/oauth1\",\"normalized_param_string\":\"oauth_consumer_key=RKCGzna7bv9YD57c_wrong&oauth_nonce=8LTsU2&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1472121295&oauth_version=1.0\",\"base_string\":\"GET&https%3A%2F%2Fecho.getpostman.com%2Foauth1&oauth_consumer_key%3DRKCGzna7bv9YD57c_wrong%26oauth_nonce%3D8LTsU2%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1472121295%26oauth_version%3D1.0\",\"signing_key\":\"D%2BEdQ-gs%24-%25%402Nu7&\"}"
+				},
+				{
+					"name": "200",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"name": "Authorization",
+								"value": "OAuth oauth_consumer_key=\"RKCGzna7bv9YD57c\",oauth_signature_method=\"HMAC-SHA1\",oauth_timestamp=\"1472121261\",oauth_nonce=\"ki0RQW\",oauth_version=\"1.0\",oauth_signature=\"s0rK92Myxx7ceUBVzlMaxiiXU00%3D\""
+							}
+						],
+						"url": {
+							"raw": "https://echo.getpostman.com/oauth1",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"oauth1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Expose-Headers",
+							"value": "",
+							"name": "Access-Control-Expose-Headers",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "95",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Aug 2016 10:34:23 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"4e-Cq3UhvpVSyl6R6204lPVIA\"",
+							"name": "ETag",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.8.1",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						}
+					],
+					"cookie": [],
+					"body": "{\"status\":\"pass\",\"message\":\"OAuth-1.0a signature verification was successful\"}"
+				}
+			]
+		},
+		{
+			"name": "DigestAuth Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						],
+						"id": "db1197d9-893a-4a94-8201-8a89db20053d"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/digest-auth",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"digest-auth"
+					]
+				},
+				"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

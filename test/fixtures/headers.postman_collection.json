@@ -1,0 +1,353 @@
+{
+	"info": {
+		"_postman_id": "962f0a0c-f2a1-4009-a99a-9b6c9a07567e",
+		"name": "Headers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request Headers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// we check to ensire that the headers we sent as request is returned as part of",
+							"// the response body. if you change the request headers, make sure to add them",
+							"// to the tests here",
+							"pm.test(\"sample request header should be returned in response body\", function () {",
+							"    pm.response.to.have.jsonBody('headers.my-sample-header', 'Lorem ipsum dolor sit amet');",
+							"});"
+						],
+						"id": "d20c936a-76e6-4f77-9118-c1e0082e5713"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "my-sample-header",
+						"value": "Lorem ipsum dolor sit amet"
+					}
+				],
+				"url": {
+					"raw": "https://postman-echo.com/headers",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"headers"
+					]
+				},
+				"description": "A `GET` request to this endpoint returns the list of all request headers as part of the response JSON.\nIn Postman, sending your own set of headers through the [Headers tab](https://www.getpostman.com/docs/requests#headers?source=echo-collection-app-onboarding) will reveal the headers as part of the response."
+			},
+			"response": [
+				{
+					"name": "my-sample-header",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "my-sample-header",
+								"value": "Lorem ipsum dolor sit amet"
+							}
+						],
+						"url": {
+							"raw": "https://echo.getpostman.com/headers",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"headers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "javascript",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "342",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Mar 2016 11:14:00 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"hostOnly": true,
+							"httpOnly": true,
+							"domain": "echo.getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": true,
+							"value": "s%3A9stja5zKmIILxq9Jvtha7Lp9LIz1VIdK.Vp8MHC%2BEUJe4ICZPXn2JAoXaV2bTgtoQd%2B3XJLNr51Y",
+							"key": "sails.sid"
+						}
+					],
+					"body": "{\"headers\":{\"host\":\"echo.getpostman.com\",\"accept\":\"*/*\",\"accept-encoding\":\"gzip, deflate, sdch\",\"accept-language\":\"en-US,en;q=0.8\",\"cache-control\":\"no-cache\",\"my-sample-header\":\"Lorem ipsum dolor sit amet\",\"postman-token\":\"3c8ea80b-f599-fba6-e0b4-a0910440e7b6\",\"user-agent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36\",\"x-forwarded-port\":\"443\",\"x-forwarded-proto\":\"https\"}}"
+				}
+			]
+		},
+		{
+			"name": "Response Headers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has the headers sent as part of request query\", function () {",
+							"    pm.response.to.have.header('foo1', 'bar1')",
+							"        .and.have.header('foo2', 'bar2');",
+							"});",
+							"",
+							"pm.test(\"sample request param should be returned in response body\", function () {",
+							"    pm.response.to.have.jsonBody('foo1', 'bar1')",
+							"        .and.have.jsonBody('foo2', 'bar2');",
+							"});"
+						],
+						"id": "a4122547-63a6-43a2-ad51-9780faa96c1f"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/response-headers?foo1=bar1&foo2=bar2",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"response-headers"
+					],
+					"query": [
+						{
+							"key": "foo1",
+							"value": "bar1"
+						},
+						{
+							"key": "foo2",
+							"value": "bar2"
+						}
+					]
+				},
+				"description": "This endpoint causes the server to send custom set of response headers. Providing header values as part of the URL parameters of a `GET` request to this endpoint returns the same as part of response header.\n\nTo send your own set of headers, simply add or replace the the URL parameters with your own set."
+			},
+			"response": [
+				{
+					"name": "Response headers",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://echo.getpostman.com/response-headers?Content-Type=text/html&test=response_headers",
+							"protocol": "https",
+							"host": [
+								"echo",
+								"getpostman",
+								"com"
+							],
+							"path": [
+								"response-headers"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "text/html"
+								},
+								{
+									"key": "test",
+									"value": "response_headers"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "html",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "",
+							"name": "Access-Control-Allow-Credentials",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "",
+							"name": "Access-Control-Allow-Headers",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "",
+							"name": "Access-Control-Allow-Methods",
+							"description": ""
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "",
+							"name": "Access-Control-Allow-Origin",
+							"description": ""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": ""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip",
+							"name": "Content-Encoding",
+							"description": ""
+						},
+						{
+							"key": "Content-Length",
+							"value": "71",
+							"name": "Content-Length",
+							"description": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "text/html; charset=utf-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Mar 2016 11:14:18 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.6.2",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding",
+							"name": "Vary",
+							"description": ""
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "Sails <sailsjs.org>",
+							"name": "X-Powered-By",
+							"description": ""
+						},
+						{
+							"key": "test",
+							"value": "response_headers",
+							"name": "test",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"hostOnly": true,
+							"httpOnly": true,
+							"domain": "echo.getpostman.com",
+							"path": "/",
+							"secure": false,
+							"session": true,
+							"value": "s%3A9stja5zKmIILxq9Jvtha7Lp9LIz1VIdK.Vp8MHC%2BEUJe4ICZPXn2JAoXaV2bTgtoQd%2B3XJLNr51Y",
+							"key": "sails.sid"
+						}
+					],
+					"body": "{\"Content-Type\":\"text/html\",\"test\":\"response_headers\"}"
+				}
+			]
+		}
+	],
+	"protocolProfileBehavior": {}
+}

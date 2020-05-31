@@ -33,3 +33,7 @@ Thumbs.db
 *.LOCAL.*
 *.REMOTE.*
 *.orig
+
+# Prevent unit test coverage reports from being added
+.coverage
+.nyc_output
