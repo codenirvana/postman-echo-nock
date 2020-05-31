@@ -3,8 +3,6 @@ const _ = require('lodash'),
   Url = require('url'),
   util = require('./util'),
   {Readable} = require('stream'),
-  Busboy = require('busboy'),
-  str = require('string-to-stream'),
   btoa = require('btoa'),
   crypto = require('crypto-js'),
   zlib = require('zlib'),
@@ -12,7 +10,7 @@ const _ = require('lodash'),
   cookie = require('cookie'),
   Hawk = require('hawk'),
   moment = require('moment'),
-  EncodingService = require('./EncodingService'),
+  cachedFiles = require('./cached-files'),
 
   ECHO_HOST = 'https://postman-echo.com',
 
@@ -23,81 +21,15 @@ const _ = require('lodash'),
   OAUTH_SIGNATURE = 'oauth_signature',
 
   OAUTH_KEY = 'D+EdQ-gs$-%@2Nu7',
+  BASIC_AUTH_USERNAME = 'postman',
+  BASIC_AUTH_PASSWORD = 'password',
+  DIGEST_AUTH_USERNAME = 'postman',
+  DIGEST_AUTH_PASSWORD ='password',
+  DIGEST_AUTH_REALM = 'Users',
+  HAWK_AUTH_KEY = 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+  HAWK_AUTH_ALGORITHM = 'sha256',
+  HAWK_AUTH_USER = 'Postman',
 
-
-  authInfoParser = function (authData) {
-    var authenticationObj = {};
-    authData.split(',').forEach(function (d) {
-        d = d.split('=');
-
-        authenticationObj[d[0].replace(' ','')] = d[1].replace(/"/g, '');
-    });
-    return authenticationObj;
-  },
-
-  multipartFormParser = function (req, reqBody, callback) {
-    const busboy = new Busboy({
-        headers: req.headers
-      }),
-      DATA_URI = 'data:application/octet-stream;base64,';
-
-    busboy.on('file', function (fieldname, file, filename) {
-      let buffer = Buffer.from('');
-
-      file.on('data', function (data) {
-        buffer = Buffer.concat([buffer, data]);
-      });
-
-      file.on('end', function () {
-        req.files[filename] = DATA_URI + buffer.toString('base64');
-      });
-    });
-    busboy.on('field', function (fieldname, val) {
-      if (req.form.hasOwnProperty(fieldname)) {
-        req.form[fieldname] = [req.form[fieldname], val];
-      } else if (Array.isArray(req.form[fieldname])) {
-        req.form[fieldname].push(val);
-      } else {
-        req.form[fieldname] = val;
-      }
-    });
-    busboy.on('finish', function () {
-      callback(null, req)
-    });
-
-    str(reqBody).pipe(busboy);
-  },
-
-  bodyParser = function (uri, reqBody, callback) {
-    const url = Url.parse(decodeURIComponent(ECHO_HOST + uri), true);
-    req = {
-        args: url.query,
-        data: {},
-        files: {},
-        form: {},
-        headers: this.req.headers,
-        json: null,
-        url: ECHO_HOST + uri
-      },
-      contentType = req.headers && req.headers['content-type'];
-
-    if (contentType && contentType.indexOf('multipart/form-data') >= 0 || contentType === 'application/x-www-form-urlencoded') {
-      return multipartFormParser(req, reqBody, callback);
-    }
-
-    req.data = reqBody;
-
-    if (contentType === 'application/json') {
-      try {
-        const json = JSON.parse(reqBody);
-        req.data = req.json = json;
-      } catch (e) {
-        req.data = reqBody;
-      }
-    }
-
-    callback(null, req);
-  },
 
   Echo = nock(ECHO_HOST,
     {allowUnmocked: true} // allow requests to unmocked routes to actually make a HTTP request
@@ -136,25 +68,25 @@ Echo
 Echo
   .post('/post')
   .query(true)
-  .reply(200, bodyParser);
+  .reply(200, util.bodyParser);
 
 // PUT Request
 Echo
   .put('/put')
   .query(true)
-  .reply(200, bodyParser);
+  .reply(200, util.bodyParser);
 
 // PATCH Request
 Echo
   .patch('/patch')
   .query(true)
-  .reply(200, bodyParser);
+  .reply(200, util.bodyParser);
 
 // DELETE Request
 Echo
   .delete('/delete')
   .query(true)
-  .reply(200, bodyParser);
+  .reply(200, util.bodyParser);
 
 
 /***** Headers *****/
@@ -189,8 +121,8 @@ Echo
   .query(true)
   .reply(function (uri, body) {
     var user = {
-      username: 'postman',
-      password: 'password'
+      username: BASIC_AUTH_USERNAME,
+      password: BASIC_AUTH_PASSWORD
     };
 
     if (this.req.headers.authorization &&
@@ -218,9 +150,9 @@ Echo
       A2,
       reqDigest,
       user = {
-        username: 'postman',
-        password: 'password',
-        realm: 'Users'
+        username: DIGEST_AUTH_USERNAME,
+        password: DIGEST_AUTH_PASSWORD,
+        realm: DIGEST_AUTH_REALM
       },
       unauthorizedResponse = [
         401,
@@ -233,7 +165,7 @@ Echo
     if(!this.req.headers.authorization) { return unauthorizedResponse; }
 
     authInfo = this.req.headers.authorization.replace(/^Digest /, '');
-    authInfo = authInfoParser(authInfo);
+    authInfo = util.authInfoParser(authInfo);
 
     if (authInfo.username !== user.username) {
       return unauthorizedResponse;
@@ -285,9 +217,9 @@ Echo
 
     Hawk.server.authenticate(this.req, function () {
       return {
-        key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-        algorithm: 'sha256',
-        user : 'Postman'
+        key: HAWK_AUTH_KEY,
+        algorithm: HAWK_AUTH_ALGORITHM,
+        user: HAWK_AUTH_USER
       };
     }).then(function () {
       callback(null,[
@@ -313,7 +245,7 @@ Echo
   .get('/oauth1')
   .query(true)
   .reply(function (uri) {
-    const authInfo = authInfoParser(this.req.headers.authorization.replace(/^OAuth /, '')),
+    const authInfo = util.authInfoParser(this.req.headers.authorization.replace(/^OAuth /, '')),
       url = Url.parse((ECHO_HOST + uri), true),
       baseUri = ECHO_HOST + url.pathname,
       parameters = {
@@ -474,7 +406,7 @@ Echo
 Echo
   .get('/encoding/utf8')
   .query(true)
-  .reply(200, EncodingService.utf8Text, {
+  .reply(200, cachedFiles.utf8Text, {
     'content-type': 'text/html; charset=utf-8',
     'transfer-encoding': 'chunked',
   });
@@ -713,13 +645,11 @@ Echo
   })
   .reply(function(uri){
     var queryIndex = this.req.path.indexOf('?'),
-      queryString = this.req.path.slice(queryIndex + 1),
-      queries = qs.parse(queryString),
       type = uri.slice(0, queryIndex).split('/')[2];
 
     return [
       200,
-      util.cachedFiles[queries.source][type],
+      cachedFiles.type,
       {
         'content-type':`application/${type}; charset=utf-8`
       }
